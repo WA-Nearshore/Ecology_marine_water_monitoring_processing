@@ -1,0 +1,10 @@
+# contents to be ignored
+.Rhistory
+.Rproj.user
+ecy_meas_rh.csv
+env_synthesis_ArcGIS_Pro_project
+output_maps
+output_graphs/*
+synthesis_existing_env_data.Rproj
+docs
+output_tables
