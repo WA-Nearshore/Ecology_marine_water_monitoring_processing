@@ -8,3 +8,5 @@ output_graphs/*
 synthesis_existing_env_data.Rproj
 docs
 output_tables
+.DS_Store
+code/.DS_Store

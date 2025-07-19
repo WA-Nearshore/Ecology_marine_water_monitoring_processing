@@ -18,7 +18,7 @@ if (sysname == "Windows") {    # DNR Windows laptop
   nrr_data_path <- 'C:/Users/pdow490/OneDrive/Work-current/HSI/synthesis_existing_env_data/Ecy_MarineMonitoring/data/Ecology_NRR_data_2018'
   sepsym <- "\\"
 } else if (sysname == "Darwin") {   # personal Mac
-  local_netCDF_home <- '/Users/peterdowty/work_local/downloads_netCDF'
+  local_netCDF_home <- '/Users/peterdowty/work_local/Ecy_MarineMonitoring/downloads_netCDF'
   home_local <- '/Users/peterdowty/work_local'
   nrr_data_path <- '/Users/peterdowty/OneDrive/Work-current/HSI/synthesis_existing_env_data/data/Ecology_NRR_data_2018'
   sepsym <- "/"
