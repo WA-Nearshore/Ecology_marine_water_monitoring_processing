@@ -25,14 +25,14 @@
 library(tidyverse)
 
 # EIM data path
-inFilePath <- str_c(home_local, "/ecy_profile_data.csv")
+# inFilePath <- str_c(home_local, "/ecy_profile_data.csv")
 
 # read EIM data and get list of unique stations
-eim_data <- read.csv(inFilePath, stringsAsFactors=FALSE)
-stns_eim <- unique(eim_data$Location_ID)
+# eim_data <- read.csv(inFilePath, stringsAsFactors=FALSE)
+# stns_eim <- unique(eim_data$Location_ID)
 
-nrr_in_eim <- "NRR001" %in% stns_eim
-print(sprintf("NRR001 is in the 6/2024 EIM data:  %s", as.character(nrr_in_eim)))
+# nrr_in_eim <- "NRR001" %in% stns_eim
+# print(sprintf("NRR001 is in the 6/2024 EIM data:  %s", as.character(nrr_in_eim)))
 # the above print statement shows that the EIM data does not contain NRR data.
 
 
@@ -140,7 +140,7 @@ print(sprintf("NRR001 added to data and stn tables."))
 
 write.csv(ecy_stn_tbl, file="output_tables/ecy_stn_tbl.csv")
 
-rm(inFilePath,eim_data,stns_eim,nrr_in_eim)
+rm(inFilePath)
 rm(nrr_discrete,nrr_prof_downl,nrr_prof_converted)
 rm(nrr_discrete_path, nrr_prof_download_path, nrr_data_path)
 rm(nrr_discrete_converted, nrr_stn_rec) 
