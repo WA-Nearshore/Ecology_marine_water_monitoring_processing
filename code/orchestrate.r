@@ -44,8 +44,8 @@ source("code/b_compile_annual_netCDF.r")
 print("Integrating NRR001...")
 source("code/get_NRR_data.r")
 
-# Make station-variable table as basis for point layer with points at each stn
-# for each var
+# Make station-variable table as basis for GIS point layer with points at each
+# stn for each var
 print("Making stn-var table...")
 source("code/make_stn_var_tbl.r")
 
@@ -60,7 +60,8 @@ for (var_index in seq_along(varList)) {
  
   print(sprintf("Processing variable %s",varList[var_index])) 
    
-  # Create data calendar for this variable.
+  # Create data calendar for this variable. Data filtered by QA flag and
+  # location within study area
   print(sprintf("   Creating calendar..."))
   source("code/d_calendar_graph.r")
 

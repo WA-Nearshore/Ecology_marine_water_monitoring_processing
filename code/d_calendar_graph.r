@@ -4,6 +4,11 @@
 #  variable selected with the value of var_index set prior to sourcing this 
 #  script.
 #
+#  This script effectively filters data based on QA flag by setting measurement
+#  data to NA if the associated QA variable does not have a value of 2 (pass).
+#
+#  This script also filters for Ecology stations within the project study area.
+#
 #  The following data objects must already exist in the active 
 #  R session workspace:
 #    var_index    Index number within varList for specific variable to process.
@@ -88,8 +93,12 @@ ecy_var_graph$data_avail <- factor(ecy_var_graph$data_avail,
 var_table <- read.csv("output_tables/var_table.csv", stringsAsFactors=FALSE)
 
 # set x-axis date breaks
-xbreaks <- as.Date(c("2000-01-01","2005-01-01","2010-01-01","2015-01-01",
+xbreaks_orig <- as.Date(c("2000-01-01","2005-01-01","2010-01-01","2015-01-01",
                    "2020-01-01","2025-01-01"))
+xbreaks <- as.Date(c("1990-01-01", "1995-01-01", "2000-01-01","2005-01-01",
+                     "2010-01-01","2015-01-01",
+                   "2020-01-01","2025-01-01"))
+
 minor_x <- as.Date(c("1999-01-01",
                      "2001-01-01","2002-01-01","2003-01-01","2004-01-01",
                      "2006-01-01","2007-01-01","2008-01-01","2009-01-01",

@@ -8,8 +8,11 @@
 #  Derived var 'depth' and dimension vars (time, station, profile) are also
 #  extracted as vectors.
 #
-#  Four output tables are produced:  measurements, profiles, stations and
-#  variable metadata.
+#  Four output tables are produced:  
+#     measurements  (table ecy_meas_qa)
+#     profiles  (table ecy_prof_tbl)
+#     stations  (table ecy_stn_tbl)
+#     variable metadata  (table var_metadata)
 #  Only the stations table is written to csv for use in GIS.
 #
 #  The measurements table (ecy_meas_qa) is available within the R session for 

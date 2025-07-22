@@ -140,7 +140,6 @@ print(sprintf("NRR001 added to data and stn tables."))
 
 write.csv(ecy_stn_tbl, file="output_tables/ecy_stn_tbl.csv")
 
-rm(inFilePath)
 rm(nrr_discrete,nrr_prof_downl,nrr_prof_converted)
 rm(nrr_discrete_path, nrr_prof_download_path, nrr_data_path)
 rm(nrr_discrete_converted, nrr_stn_rec) 
