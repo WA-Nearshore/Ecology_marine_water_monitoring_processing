@@ -109,7 +109,7 @@ for (istn in stnList) {
    # Create color profile graphs for this variable and this station 
    pstn <-ggplot(data = ecy_var_filt_stn,
               mapping = aes(month, Depth, fill=Var)) +
-     geom_raster() + 
+     geom_tile() + 
      scale_fill_viridis(name=ytitle,option ="C") +
      facet_wrap(~year) +
      scale_y_continuous(trans = "reverse") +
@@ -131,7 +131,7 @@ for (istn in stnList) {
 
    # write graph to png file
    fstem <- str_c(home_local, "output_graphs", sep="/")
-   fname1 <- str_c("colorProf",istn,var_name, sep="_")
+   fname1 <- str_c("AAcolorProf",istn,var_name, sep="_")
    fname2 <- str_c(fname1,".png", sep="")
    fpath <- str_c(fstem,fname2, sep="/")
    
