@@ -210,9 +210,8 @@ if (demo_plots) {
               axis.title.x = element_text(margin=margin(t=10))
             ) +
             scale_y_continuous(breaks=c(0,50000,100000), 
-                               labels=c("0","5","10"),
                                limits=c(0,100000),
-                               name="Data Count in thousands") +
+                               name="Data Count") +
             scale_x_continuous(name = "Depth (meters)")
    # single NO3 panel
    ecy_meas_long_no3 <- ecy_meas_long %>% filter(variable == "NO3")
