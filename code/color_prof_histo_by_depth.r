@@ -166,7 +166,8 @@ if (demo_plots) {
 
    pvars <- ggplot(data = ecy_meas_long_ctd, 
                    mapping = aes(x=Depth)) +
-            geom_histogram(fill="gray40", color="white", linewidth=0.1) +
+            geom_histogram(fill="gray40", color="white", linewidth=0.1i,
+                           binwidth=10) +
             facet_wrap(~variable) +
             theme_bw() +
             theme(
@@ -184,7 +185,8 @@ if (demo_plots) {
    ecy_meas_long_nuts <- ecy_meas_long %>% filter(variable %in% nuts)
    pnuts <- ggplot(data = ecy_meas_long_nuts, 
                    mapping = aes(x=Depth)) +
-            geom_histogram(fill="gray40", color="white", linewidth=0.1) +
+            geom_histogram(fill="gray40", color="white", linewidth=0.1,
+                           binwidth=10) +
             facet_wrap(~variable) +
             theme_bw() +
             theme(
@@ -192,8 +194,42 @@ if (demo_plots) {
               axis.title.y = element_text(margin=margin(r=10)),
               axis.title.x = element_text(margin=margin(t=10))
             ) +
-            scale_x_continuous(name="Depth (meters")
+            scale_x_continuous(name="Depth (meters)")
 #            scale_x_continuous(limits=c(0,12), name="Depth (meters")
+   
+   # single temp panel
+   ecy_meas_long_temp <- ecy_meas_long %>% filter(variable == "Temp")
+   ptemp <- ggplot(data = ecy_meas_long_temp, 
+                   mapping = aes(x=Depth)) +
+            geom_histogram(fill="gray30", color="white", linewidth=0.1,
+                           binwidth=5) +
+            theme_bw() +
+            theme(
+              strip.background = element_rect(fill="white"),
+              axis.title.y = element_text(margin=margin(r=10)),
+              axis.title.x = element_text(margin=margin(t=10))
+            ) +
+            scale_y_continuous(breaks=c(0,50000,100000), 
+                               labels=c("0","5","10"),
+                               limits=c(0,100000),
+                               name="Data Count in thousands") +
+            scale_x_continuous(name = "Depth (meters)")
+   # single NO3 panel
+   ecy_meas_long_no3 <- ecy_meas_long %>% filter(variable == "NO3")
+   pno3 <- ggplot(data = ecy_meas_long_no3, 
+                   mapping = aes(x=Depth)) +
+            geom_histogram(fill="gray30", color="white", linewidth=0.1,
+                           binwidth=5) +
+            theme_bw() +
+            theme(
+              strip.background = element_rect(fill="white"),
+              axis.title.y = element_text(margin=margin(r=10)),
+              axis.title.x = element_text(margin=margin(t=10))
+            ) +
+            scale_x_continuous(name="Depth (meters)") +
+            scale_y_continuous(name="Data Count")
+   
+   
 }   # close demo_plots if block
 
 

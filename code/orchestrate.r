@@ -17,6 +17,9 @@
 ################################################################################
 
 library(tidyverse)
+
+# define vector of all variable names in dataset; assign paths for local netCDF
+# data, a local output location and location of NRR001 data
 source("code/definitions.r")
 
 
