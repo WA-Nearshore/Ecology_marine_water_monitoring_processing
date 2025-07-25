@@ -158,24 +158,42 @@ if (demo_plots) {
                          "Cond","Temp"),
                   names_to="variable") %>%
      drop_na(value) 
+   
+   # select ctd variables (not nutrients)
+   ctd_vars <- c("BatC","Cond","Density","DOAdjusted","FluorAdjusted",
+                 "Salinity","Temp","Turb","Xmiss_25cm")
+   ecy_meas_long_ctd <- ecy_meas_long %>% filter(variable %in% ctd_vars)
 
-   pvars <- ggplot(data = ecy_meas_long, 
+   pvars <- ggplot(data = ecy_meas_long_ctd, 
                    mapping = aes(x=Depth)) +
-            geom_histogram() +
+            geom_histogram(fill="gray40", color="white", linewidth=0.1) +
             facet_wrap(~variable) +
             theme_bw() +
-            theme(strip.background = element_rect(fill="white"))
+            theme(
+              strip.background = element_rect(fill="white"),
+              axis.title.y = element_text(margin=margin(r=10)),
+              axis.title.x = element_text(margin=margin(t=10))
+            ) +
+            scale_y_continuous(breaks=c(0,50000,100000), 
+                               labels=c("0","5","10"),
+                               name="Data Count in thousands") +
+            scale_x_continuous(name = "Depth (meters)")
 
    # select nutrient variables only
    nuts <- c("NH4","NO2","NO3","PO4","SiOH4")
    ecy_meas_long_nuts <- ecy_meas_long %>% filter(variable %in% nuts)
    pnuts <- ggplot(data = ecy_meas_long_nuts, 
                    mapping = aes(x=Depth)) +
-            geom_histogram() +
+            geom_histogram(fill="gray40", color="white", linewidth=0.1) +
             facet_wrap(~variable) +
             theme_bw() +
-            theme(strip.background = element_rect(fill="white")) +
-            scale_x_continuous(limits=c(0,12))
+            theme(
+              strip.background = element_rect(fill="white"),
+              axis.title.y = element_text(margin=margin(r=10)),
+              axis.title.x = element_text(margin=margin(t=10))
+            ) +
+            scale_x_continuous(name="Depth (meters")
+#            scale_x_continuous(limits=c(0,12), name="Depth (meters")
 }   # close demo_plots if block
 
 
