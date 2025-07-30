@@ -12,6 +12,7 @@
 ###############################################################################
 
 library(tidyverse)
+library(viridis)
 
 
 # specify variable by index:
@@ -19,7 +20,8 @@ library(tidyverse)
 # 6-10:  "Xmiss_25cm","BatC","FluorAdjusted","Turb","DOAdjusted",
 # 11-14: "Salinity","Density","Cond","Temp")
 var_index <- 14
-
+var_name <- "Temperature (deg C)"
+legend_name <- "Median\nTemperature"
 
 # Open table with distance-from-ocean and HSIL flag, join and filter for HSIL
 filepath2 <- str_c("output_tables","ecy_stations_distance_export.csv", sep="/")
@@ -72,9 +74,13 @@ p <- ggplot(data=ecy_season_stats_fct,
      facet_wrap(vars(season_fct), nrow=4) +
      theme_bw() +
      theme(
-       axis.text.x = element_text(angle=90)
+       axis.text.x = element_text(angle=90),
+       axis.title.x = element_text(margin=margin(t=10)),
+       axis.title.y = element_text(margin=margin(r=10))
      ) +
-     scale_fill_viridis_d(option="H")
+     scale_fill_viridis(option="H", discrete=FALSE, name=legend_name) +
+     scale_x_discrete(name="Station") +
+     scale_y_continuous(name=var_name)
 
 
 
