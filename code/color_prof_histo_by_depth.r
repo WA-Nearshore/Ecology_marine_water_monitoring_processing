@@ -166,7 +166,7 @@ if (demo_plots) {
 
    pvars <- ggplot(data = ecy_meas_long_ctd, 
                    mapping = aes(x=Depth)) +
-            geom_histogram(fill="gray40", color="white", linewidth=0.1i,
+            geom_histogram(fill="gray40", color="white", linewidth=0.1,
                            binwidth=10) +
             facet_wrap(~variable) +
             theme_bw() +
