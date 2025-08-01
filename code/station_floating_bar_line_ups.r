@@ -6,6 +6,7 @@
 #
 #  Input data must be already loaded in the workspace:
 #    ecy_meas_qa   data frame of measurement and QA variables
+#    varList   char vector of variable column names in data
 #
 #  July 2025
 #
@@ -26,8 +27,8 @@ var_index <- 14
 var_name <- "Temperature (deg C)"
 legend_name <- "Median\nTemperature"
 
-# set filter threshold for removing stations with low data count
-count_filter <- 30
+# set threshold for removing stations with low count of season sample dates 
+count_filter <- 10
 
 
 ###############################################################################
@@ -44,6 +45,10 @@ ecy_meas_qa_jn <- ecy_meas_qa %>%
   left_join(ecy_stn_dist_sel, by="Station") %>%
   filter(subgroup=="HSIL_study_area") %>%
   select(all_of(varList[var_index]), Depth, obs_index, Station, date, subgroup)
+# generalize variable name so code can be used for any variable
+vnames <- names(ecy_meas_qa_jn)
+vnames[1] <- "Value"
+names(ecy_meas_qa_jn) <- vnames
 
 
 ###############################################################################
@@ -79,32 +84,57 @@ stn_levels <- ecy_stn_dist_sel_sort$Station
 
 
 ###############################################################################
-# get data counts (by station and season) & filter low count stations
+# get stats by station & season; record num. of sample dates for each stat 
 ###############################################################################
 # group by station and season and summarize stats
 ecy_season_stats <- ecy_meas_qa_season_10m %>%
   group_by(Station, season_fct) %>%
-  summarize(mean = mean(Temp, na.rm=TRUE),
-            min = min(Temp, na.rm=TRUE),
-            max = max(Temp, na.rm=TRUE),
-            median = median(Temp, na.rm=TRUE),
-            data_count = n()
+  summarize(mean = mean(Value, na.rm=TRUE),
+            min = min(Value, na.rm=TRUE),
+            max = max(Value, na.rm=TRUE),
+            median = median(Value, na.rm=TRUE),
+            stdev = sd(Value, na.rm=TRUE),
+            data_count = length(unique(date)) 
   )
 ecy_season_stats_fct <- ecy_season_stats %>%
   mutate(Station_fct = factor(Station, levels=stn_levels))
 
-# apply station filter based on min number of data points; first make histo to
+# Make histogram of station-season frequencies by data count to 
 # help select a threshold for number of data pts.
 phist <- ggplot(data=ecy_season_stats_fct,
                 mapping = aes(x=data_count)) +
-         geom_histogram(binwidth=30, fill="gray40", color="white", center=15) +
+         geom_histogram(binwidth=1, fill="gray40", color="white", center=0.5) +
          theme_bw() +
          theme(
            axis.title.x = element_text(margin = margin(t=10)),
            axis.title.y = element_text(margin = margin(r=10))
          ) +
-         scale_x_continuous(name="Season Data Count") +
+         scale_x_continuous(name="Count of Season Sample Dates") +
          scale_y_continuous(name="Number of Occurrences")
+
+# to look at distribution of residuals, make needed join and calc residuals
+ecy_season_10m_jn1 <- ecy_meas_qa_season_10m %>%
+  left_join(ecy_season_stats_fct, by = join_by("Station", "season_fct")) %>%
+  mutate(z_residual = (Value - mean)/stdev)
+# make freq. histogram of z residuals
+p_res_hist <- ggplot(data=ecy_season_10m_jn1,
+                     mapping=aes(x=z_residual)) +
+              geom_histogram(aes(y=..density..), binwidth=0.1, fill="gray65", 
+                             color="white") +
+              theme_bw() +
+              theme(
+                axis.title.x = element_text(margin = margin(t=10)),
+                axis.title.y = element_text(margin = margin(r=10))
+              ) +
+              scale_x_continuous(name="Residual Z Value") +
+              scale_y_continuous(name="Frequency")
+# add normal curve
+p_res_hist2 <- p_res_hist +
+    stat_function(fun=dnorm, color="gray35", linewidth=1.5)
+
+
+
+
 
 # filter out stations with low season data counts in any season; first create
 # histogram to help specify data count cutoff
