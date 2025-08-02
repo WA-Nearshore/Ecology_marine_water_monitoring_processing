@@ -28,7 +28,7 @@ var_name <- "Temperature (deg C)"
 legend_name <- "Median\nTemperature"
 
 # set threshold for removing stations with low count of season sample dates 
-count_filter <- 10
+count_filter <- 8
 
 
 ###############################################################################
@@ -135,9 +135,11 @@ p_res_hist2 <- p_res_hist +
 
 
 
-
+###############################################################################
 # filter out stations with low season data counts in any season; first create
 # histogram to help specify data count cutoff
+###############################################################################
+
 ecy_season_stn_min_counts <- ecy_season_stats_fct %>%
   group_by(Station) %>%
   summarize(min_count = min(data_count))
