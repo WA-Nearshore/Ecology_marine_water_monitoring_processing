@@ -7,6 +7,10 @@
 #   varList  List of variables in Ecology data, created in 
 #            b_compile_annual_netCDF.r
 #
+#  Note - this should be restructured so there is a function that can be called
+#  even from command line to create seasonal graph for specified site and
+#  specified profile reduction method. Perhaps add a depth band specifier.
+#
 # July 2024
 ################################################################################
 
