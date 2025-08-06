@@ -23,9 +23,9 @@ library(viridis)
 # 1-5:   "PO4","SiOH4","NH4","NO2","NO3",
 # 6-10:  "Xmiss_25cm","BatC","FluorAdjusted","Turb","DOAdjusted",
 # 11-14: "Salinity","Density","Cond","Temp")
-var_index <- 14
-var_name <- "Temperature (deg C)"
-legend_name <- "Median\nTemperature"
+var_index <- 9 
+var_name <- "Turbidity"
+legend_name <- "Turbidity\n(NTU)"
 
 # set threshold for removing stations with low count of season sample dates 
 count_filter <- 8
@@ -115,6 +115,7 @@ phist <- ggplot(data=ecy_season_stats_fct,
 # to look at distribution of residuals, make needed join and calc residuals
 ecy_season_10m_jn1 <- ecy_meas_qa_season_10m %>%
   left_join(ecy_season_stats_fct, by = join_by("Station", "season_fct")) %>%
+  filter(!is.na(Value)) %>%
   mutate(z_residual = (Value - mean)/stdev)
 # make freq. histogram of z residuals
 p_res_hist <- ggplot(data=ecy_season_10m_jn1,
@@ -126,7 +127,7 @@ p_res_hist <- ggplot(data=ecy_season_10m_jn1,
                 axis.title.x = element_text(margin = margin(t=10)),
                 axis.title.y = element_text(margin = margin(r=10))
               ) +
-              scale_x_continuous(name="Residual Z Value") +
+              scale_x_continuous(name="Deviation Z Value", limits=c(-5,5)) +
               scale_y_continuous(name="Frequency")
 # add normal curve
 p_res_hist2 <- p_res_hist +
