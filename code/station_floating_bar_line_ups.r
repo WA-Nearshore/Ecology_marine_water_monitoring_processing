@@ -197,7 +197,7 @@ if (var_index == 14) {
      select(season_fct, median, Station_fct) %>%
      left_join(ecy_stn_dist_sel, by=join_by("Station_fct" == "Station"))
   
-  
+ # model1 <- lm(median ~ ocean_dist_km, data=temp_summer)  
 }
 
 
