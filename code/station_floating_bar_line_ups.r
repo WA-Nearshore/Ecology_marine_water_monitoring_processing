@@ -23,9 +23,9 @@ library(viridis)
 # 1-5:   "PO4","SiOH4","NH4","NO2","NO3",
 # 6-10:  "Xmiss_25cm","BatC","FluorAdjusted","Turb","DOAdjusted",
 # 11-14: "Salinity","Density","Cond","Temp")
-var_index <- 9 
-var_name <- "Turbidity"
-legend_name <- "Turbidity\n(NTU)"
+var_index <- 14 
+var_name <- "Temperature (deg-C)"
+legend_name <- "Median\nTemperature\n(deg-C)"
 
 # set threshold for removing stations with low count of season sample dates 
 count_filter <- 8
@@ -117,18 +117,27 @@ ecy_season_10m_jn1 <- ecy_meas_qa_season_10m %>%
   left_join(ecy_season_stats_fct, by = join_by("Station", "season_fct")) %>%
   filter(!is.na(Value)) %>%
   mutate(z_residual = (Value - mean)/stdev)
+
+# create data for normal curve
+normdf <- data.frame(z = seq(-4,4,by=0.04))
+normdf <- normdf %>% mutate(npdf = dnorm(z, mean=0, sd=1))
+
 # make freq. histogram of z residuals
 p_res_hist <- ggplot(data=ecy_season_10m_jn1,
                      mapping=aes(x=z_residual)) +
               geom_histogram(aes(y=..density..), binwidth=0.1, fill="gray65", 
                              color="white") +
+              geom_line(data=normdf, 
+                        mapping=aes(x=z, y=npdf), color="gray20",
+                        linewidth=1.0) +
               theme_bw() +
               theme(
-                axis.title.x = element_text(margin = margin(t=10)),
-                axis.title.y = element_text(margin = margin(r=10))
+                axis.title.x = element_text(margin = margin(t=10), size=14),
+                axis.title.y = element_text(margin = margin(r=10), size=14),
+                axis.text = element_text(size=12)
               ) +
-              scale_x_continuous(name="Deviation Z Value", limits=c(-5,5)) +
-              scale_y_continuous(name="Frequency")
+              scale_x_continuous(name="Deviation Z Value", limits=c(-4,4)) +
+              scale_y_continuous(name="Density")
 # add normal curve
 p_res_hist2 <- p_res_hist +
     stat_function(fun=dnorm, color="gray35", linewidth=1.5)
@@ -179,7 +188,17 @@ p <- ggplot(data=ecy_season_stats_fct_nfilt,
 
 
 
-
+###############################################################################
+# get summer temp. regression with dist. from ocean and isolate large residuals 
+###############################################################################
+if (var_index == 14) {
+  temp_summer <- ecy_season_stats_fct_nfilt %>%
+     filter(season_fct == "Jul-Aug-Sep") %>%
+     select(season_fct, median, Station_fct) %>%
+     left_join(ecy_stn_dist_sel, by=join_by("Station_fct" == "Station"))
+  
+  
+}
 
 
 
