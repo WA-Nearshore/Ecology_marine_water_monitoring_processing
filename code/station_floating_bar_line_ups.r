@@ -198,11 +198,15 @@ if (var_index == 14) {
   resids <- model1$residuals
  
   resids_df <- data.frame(residuals = resids)
+  temp_summer_df <- cbind(temp_summer, resids_df) 
+   
+  resid_pts <- resids_df %>%
+    mutate(y=rep(0,times=30), x=residuals)
   
-  resid_pts <- resids %>%
-    mutate(y=rep(0,times=30), x=.resid)
-  
-  
+  p_resid <- ggplot(data=resid_pts,
+                    mapping = aes(x=x,y=y)) +
+    geom_point() +
+    theme_bw()
   
   
 }
