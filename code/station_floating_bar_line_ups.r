@@ -94,7 +94,8 @@ ecy_season_stats <- ecy_meas_qa_season_10m %>%
             max = max(Value, na.rm=TRUE),
             median = median(Value, na.rm=TRUE),
             stdev = sd(Value, na.rm=TRUE),
-            data_count = length(unique(date)) 
+            data_count = length(unique(date)),
+            .groups = "drop_last"
   )
 ecy_season_stats_fct <- ecy_season_stats %>%
   mutate(Station_fct = factor(Station, levels=stn_levels))
@@ -138,10 +139,6 @@ p_res_hist <- ggplot(data=ecy_season_10m_jn1,
               ) +
               scale_x_continuous(name="Deviation Z Value", limits=c(-4,4)) +
               scale_y_continuous(name="Density")
-# add normal curve
-p_res_hist2 <- p_res_hist +
-    stat_function(fun=dnorm, color="gray35", linewidth=1.5)
-
 
 
 
@@ -194,10 +191,20 @@ p <- ggplot(data=ecy_season_stats_fct_nfilt,
 if (var_index == 14) {
   temp_summer <- ecy_season_stats_fct_nfilt %>%
      filter(season_fct == "Jul-Aug-Sep") %>%
-     select(season_fct, median, Station_fct) %>%
+     select(Station, season_fct, median, Station_fct) %>%
      left_join(ecy_stn_dist_sel, by=join_by("Station_fct" == "Station"))
   
- # model1 <- lm(median ~ ocean_dist_km, data=temp_summer)  
+  model1 <- lm(median ~ ocean_dist_km, data=temp_summer)
+  resids <- model1$residuals
+ 
+  resids_df <- data.frame(residuals = resids)
+  
+  resid_pts <- resids %>%
+    mutate(y=rep(0,times=30), x=.resid)
+  
+  
+  
+  
 }
 
 
