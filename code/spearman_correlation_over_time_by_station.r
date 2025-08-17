@@ -18,8 +18,14 @@ library(tidyverse)
 stn_tbl_path <- str_c("output_tables", "ecy_stations_subgroups_tbl.csv", sep=sepsym)
 stations <- read.csv(stn_tbl_path, stringsAsFactors=FALSE)
 
+##### check that all instances of QA=1 corresponds with value=NA #####
 
-
+# loop through variables to filter values that don't pass QA
+for (ivar in seq(1:14)) {
+  ecy_meas_qa[,ivar] <- ifelse(is.na(ecy_meas_qa[,ivar+14]), NA,
+                               ifelse(ecy_meas_qa[,ivar+14] == 2,
+                               ecy_meas_qa[,ivar], NA))
+}                           
 
 # pivot longer so variables are no longer in separate columns
 long_good_data_recs <- ecy_meas_qa %>%
