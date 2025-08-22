@@ -54,12 +54,10 @@ ecy_filt_long <- ecy_meas_qa %>%
 ecy_filt_long_days <- ecy_filt_long %>%
    mutate(ndays_time = map_int(date, date_to_numeric))
 
-
-
 # group by station and parameter and get Spearman stats
-spearman.out <- ecy_filt_long %>%
+spearman.out <- ecy_filt_long_days %>%
   group_by(Station, parameter) %>%
-  mutate(spearman_r = (corr.test(date,value,method="spearman"))$r)
+  mutate(spearman_r = (corr.test(ndays_time, value, method="spearman"))$r)
 
 
 
