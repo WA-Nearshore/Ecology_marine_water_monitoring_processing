@@ -13,6 +13,22 @@ library(tidyverse)
 library(psych)
 
 
+########  functions #########
+get_spearman <- function (data_frame) {
+  spearman_out <- corr_test(data.frame$time, data.frame$value,
+                            method="spearman")
+  spearman_stats <- data.frame(r = spearman_out$r,
+                               p = spearman_out$p)
+  return(spearman_stats)
+}
+date_to_numeric <- function(date) {
+  reference_date <- ymd("1995-01-01")
+  daysdiff <- date - reference_date
+  numeric_days <- as.numeric(daysdiff, units="days")
+  return(numeric_days)
+}
+
+
 # get enhanced station table exported from GIS with subgroup attribute that can 
 # be used to filter stations in the HSIL study area 
 stn_tbl_path <- str_c("output_tables", "ecy_stations_subgroups_tbl.csv", sep=sepsym)
@@ -29,13 +45,19 @@ for (ivar in seq(1:14)) {
 }                           
 
 # pivot longer so variables are no longer in separate columns
-long_good_data_recs <- ecy_meas_qa %>%
+ecy_filt_long <- ecy_meas_qa %>%
     pivot_longer(PO4:Temp, names_to = "parameter", values_to = "value") %>%
     select(Depth,obs_index,station_index,Station,date,parameter,value) %>%
     drop_na(value)
 
+# add time as day since 1970-01-01, Spearman requires numberic variable
+ecy_filt_long_days <- ecy_filt_long %>%
+   mutate(ndays_time = map_int(date, date_to_numeric))
+
+
+
 # group by station and parameter and get Spearman stats
-spearman.out <- long_good_data_recs %>%
+spearman.out <- ecy_filt_long %>%
   group_by(Station, parameter) %>%
   mutate(spearman_r = (corr.test(date,value,method="spearman"))$r)
 
