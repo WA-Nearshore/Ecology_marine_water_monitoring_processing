@@ -51,8 +51,10 @@ ecy_filt_long <- ecy_meas_qa %>%
     drop_na(value)
 
 # add time as day since 1970-01-01, Spearman requires numberic variable
+reference_date <- ymd("1995-01-01")
 ecy_filt_long_days <- ecy_filt_long %>%
-   mutate(ndays_time = map_int(date, date_to_numeric))
+#   mutate(ndays_time = map_int(date, date_to_numeric))
+   mutate(ndays_time = as.numeric(date - reference_date, units="days"))
 
 # group by station and parameter and get Spearman stats
 spearman.out <- ecy_filt_long_days %>%
