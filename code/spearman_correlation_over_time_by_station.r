@@ -19,17 +19,9 @@ mx_depth <- 10
 
 ########  functions #########
 get_spearman <- function (data_frame) {
-  spearman_out <- corr_test(data.frame$time, data.frame$value,
-                            method="spearman")
-  spearman_stats <- data.frame(r = spearman_out$r,
-                               p = spearman_out$p)
+  spearman_out <- corr_test(data.frame$time, data.frame$value, method="spearman")
+  spearman_stats <- data.frame(r = spearman_out$r, p = spearman_out$p)
   return(spearman_stats)
-}
-date_to_numeric <- function(date) {
-  reference_date <- ymd("1995-01-01")
-  daysdiff <- date - reference_date
-  numeric_days <- as.numeric(daysdiff, units="days")
-  return(numeric_days)
 }
 
 
@@ -37,9 +29,8 @@ date_to_numeric <- function(date) {
 # be used to filter stations in the HSIL study area 
 stn_tbl_path <- str_c("output_tables", "ecy_stations_subgroups_tbl.csv", sep=sepsym)
 stations <- read.csv(stn_tbl_path, stringsAsFactors=FALSE)
-ecy_meas_qa_filt <- ecy_meas_qa %>%
-  left_join(stations, by="Station") %>%
-  filter(subgroup == "HSIL_study_area")
+ecy_meas_qa_filt <- ecy_meas_qa %>% left_join(stations, by="Station") %>%
+                                    filter(subgroup == "HSIL_study_area")
 
 # loop through variables to swap out values that don't pass QA (set to NA)
 for (ivar in seq(1:14)) {
@@ -54,20 +45,17 @@ ecy_filt_long <- ecy_meas_qa %>%
     select(Depth,obs_index,station_index,Station,date,parameter,value) %>%
     drop_na(value)
 
-<<<<<<< HEAD
 # add time as day since 1970-01-01, Spearman requires numberic variable
 reference_date <- ymd("1995-01-01")
 ecy_filt_long_days <- ecy_filt_long %>%
-#   mutate(ndays_time = map_int(date, date_to_numeric))
    mutate(ndays_time = as.numeric(date - reference_date, units="days"))
-=======
+
 # get mean values for all parameters within depth 
 long_mean_depth_values <- long_good_data_recs %>%
   group_by(Station, parameter, date) %>%
+  summarize(prm_mean_val = mean(value))
   
 
-
->>>>>>> afe8730 (Working on Spearman.)
 
 # group by station and parameter and get Spearman stats
 spearman.out <- ecy_filt_long_days %>%
