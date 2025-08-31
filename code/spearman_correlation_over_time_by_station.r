@@ -15,6 +15,9 @@ library(psych)
 # set depth that defines bottom of layer (top=surface) for parameter averaging
 mx_depth <- 10
 
+# set min number of records for Spearman to be run on Station-parameters
+min_n_Spearman <- 5
+
 
 
 ########  functions #########
@@ -42,25 +45,33 @@ for (ivar in seq(1:14)) {
 # pivot longer so variables are no longer in separate columns
 ecy_filt_long <- ecy_meas_qa %>%
     pivot_longer(PO4:Temp, names_to = "parameter", values_to = "value") %>%
-    select(Depth,obs_index,station_index,Station,date,parameter,value) %>%
+    select(Depth,obs_index,Station,date,parameter,value) %>%
     drop_na(value)
 
-# add time as day since 1970-01-01, Spearman requires numberic variable
-reference_date <- ymd("1995-01-01")
-ecy_filt_long_days <- ecy_filt_long %>%
-   mutate(ndays_time = as.numeric(date - reference_date, units="days"))
-
 # get mean values for all parameters within depth 
-long_mean_depth_values <- long_good_data_recs %>%
+ecy_filt_long_mean_values <- ecy_filt_long %>%
   group_by(Station, parameter, date) %>%
   summarize(prm_mean_val = mean(value))
   
+# get data counts by Station-parameter pairs so low n cases can be removed
+# Use of corr.test below for Spearman gives error for n=1 cases.
+station_prm_record_count <- ecy_filt_long_mean_values %>%
+  group_by(Station,parameter) %>%
+  summarize(rec_count = n()) %>%
+  arrange(rec_count)
+
+
+
+# add time as day since 1989-01-01, Spearman requires numeric variable
+reference_date <- ymd("1989-01-01")
+ecy_filt_long_means_days <- ecy_filt_long_mean_values %>%
+   mutate(ndays_time = as.numeric(date - reference_date, units="days"))
 
 
 # group by station and parameter and get Spearman stats
-spearman.out <- ecy_filt_long_days %>%
+spearman.out <- ecy_filt_long_means_days %>%
   group_by(Station, parameter) %>%
-  mutate(spearman_r = (corr.test(ndays_time, value, method="spearman"))$r)
+  mutate(spearman_r = (corr.test(ndays_time, prm_mean_val, method="spearman"))$r)
 
 
 
