@@ -15,7 +15,8 @@ library(psych)
 # set depth that defines bottom of layer (top=surface) for parameter averaging
 mx_depth <- 10
 
-# set min number of records for Spearman to be run on Station-parameters
+# set min number of records for Spearman to be run on Station-parameters.
+# Value of 5 results in 31 station-prm combos out of 1011 being removed.
 min_n_Spearman <- 5
 
 
@@ -60,18 +61,21 @@ station_prm_record_count <- ecy_filt_long_mean_values %>%
   summarize(rec_count = n()) %>%
   arrange(rec_count)
 
-
+# join data counts back onto table of mean depth values and then filter 
+ecy_filt_long_mean_jn <- ecy_filt_long_mean_values %>%
+  left_join(station_prm_record_count, by=join_by(Station, parameter)) %>%
+  filter(rec_count >= min_n_Spearman)
 
 # add time as day since 1989-01-01, Spearman requires numeric variable
 reference_date <- ymd("1989-01-01")
-ecy_filt_long_means_days <- ecy_filt_long_mean_values %>%
+ecy_filt_long_mean_jn_days <- ecy_filt_long_mean_jn %>%
    mutate(ndays_time = as.numeric(date - reference_date, units="days"))
 
 
 # group by station and parameter and get Spearman stats
-spearman.out <- ecy_filt_long_means_days %>%
+spearman.out <- ecy_filt_long_mean_jn_days %>%
   group_by(Station, parameter) %>%
-  mutate(spearman_r = (corr.test(ndays_time, prm_mean_val, method="spearman"))$r)
+  summarize(spearman_r = (corr.test(ndays_time, prm_mean_val, method="spearman"))$r)
 
 
 
