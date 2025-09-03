@@ -75,7 +75,8 @@ ecy_filt_long_mean_jn_days <- ecy_filt_long_mean_jn %>%
 # group by station and parameter and get Spearman stats
 spearman.out <- ecy_filt_long_mean_jn_days %>%
   group_by(Station, parameter) %>%
-  summarize(spearman_r = (corr.test(ndays_time, prm_mean_val, method="spearman"))$r)
+  summarize(spearman_r = (corr.test(ndays_time, prm_mean_val, method="spearman"))$r,
+            spearman_pval = (corr.test(ndays_time, prm_mean_val, method="spearman"))$p)
 
 
 
