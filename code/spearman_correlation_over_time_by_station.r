@@ -16,7 +16,7 @@ library(psych)
 mx_depth <- 10
 
 # set min number of records for Spearman to be run on Station-parameters.
-# Value of 5 results in 31 station-prm combos out of 1011 being removed.
+# Value of 5 results in 31 station-prm combos being removed out of 1011. 
 min_n_Spearman <- 5
 
 
@@ -44,7 +44,7 @@ for (ivar in seq(1:14)) {
 }                           
 
 # pivot longer so variables are no longer in separate columns
-ecy_filt_long <- ecy_meas_qa %>%
+ecy_filt_long <- ecy_meas_qa_filt %>%
     pivot_longer(PO4:Temp, names_to = "parameter", values_to = "value") %>%
     select(Depth,obs_index,Station,date,parameter,value) %>%
     drop_na(value)
