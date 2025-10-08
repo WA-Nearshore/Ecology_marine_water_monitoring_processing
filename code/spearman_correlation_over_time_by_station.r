@@ -17,7 +17,7 @@ mx_depth <- 10
 
 # set min number of records for Spearman to be run on Station-parameters.
 # Value of 5 results in 31 station-prm combos being removed out of 1011. 
-min_n_Spearman <- 5
+min_n_Spearman <- 8
 
 
 
@@ -49,8 +49,9 @@ ecy_filt_long <- ecy_meas_qa_filt %>%
     select(Depth,obs_index,Station,date,parameter,value) %>%
     drop_na(value)
 
-# get mean values for all parameters within depth 
+# get mean values for all parameters within specified depth band 
 ecy_filt_long_mean_values <- ecy_filt_long %>%
+  filter(Depth <= mx_depth) %>%
   group_by(Station, parameter, date) %>%
   summarize(prm_mean_val = mean(value))
   
@@ -61,19 +62,27 @@ station_prm_record_count <- ecy_filt_long_mean_values %>%
   summarize(rec_count = n()) %>%
   arrange(rec_count)
 
-# join data counts back onto table of mean depth values and then filter 
+# join data counts back onto table of mean depth values 
 ecy_filt_long_mean_jn <- ecy_filt_long_mean_values %>%
-  left_join(station_prm_record_count, by=join_by(Station, parameter)) %>%
+  left_join(station_prm_record_count, by=join_by(Station, parameter)) 
+
+# filter records for station-parameter min. number of records
+ecy_long_mean_passMinN <- ecy_filt_long_mean_jn %>%
   filter(rec_count >= min_n_Spearman)
+# get list of stations that were filtered out for not meeting min N
+pass_stns <- unique(ecy_long_mean_passMinN$Station)
+all_stns <- unique(ecy_filt_long_mean_jn$Station)
+fail_stns <- setdiff(all_stns, pass_stns)
+
 
 # add time as day since 1989-01-01, Spearman requires numeric variable
 reference_date <- ymd("1989-01-01")
-ecy_filt_long_mean_jn_days <- ecy_filt_long_mean_jn %>%
+ecy_filt_long_mean_passMinN_days <- ecy_filt_long_mean_passMinN %>%
    mutate(ndays_time = as.numeric(date - reference_date, units="days"))
 
 
 # group by station and parameter and get Spearman stats
-spearman.out <- ecy_filt_long_mean_jn_days %>%
+spearman.out <- ecy_filt_long_mean_passMinN_days %>%
   group_by(Station, parameter) %>%
   summarize(spearman_r = (corr.test(ndays_time, prm_mean_val, method="spearman"))$r,
             spearman_pval = (corr.test(ndays_time, prm_mean_val, method="spearman"))$p)
