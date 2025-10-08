@@ -77,12 +77,12 @@ fail_stns <- setdiff(all_stns, pass_stns)
 
 # add time as day since 1989-01-01, Spearman requires numeric variable
 reference_date <- ymd("1989-01-01")
-ecy_filt_long_mean_passMinN_days <- ecy_filt_long_mean_passMinN %>%
+ecy_long_mean_passMinN_days <- ecy_long_mean_passMinN %>%
    mutate(ndays_time = as.numeric(date - reference_date, units="days"))
 
 
 # group by station and parameter and get Spearman stats
-spearman.out <- ecy_filt_long_mean_passMinN_days %>%
+spearman.out <- ecy_long_mean_passMinN_days %>%
   group_by(Station, parameter) %>%
   summarize(spearman_r = (corr.test(ndays_time, prm_mean_val, method="spearman"))$r,
             spearman_pval = (corr.test(ndays_time, prm_mean_val, method="spearman"))$p)
