@@ -87,5 +87,8 @@ spearman.out <- ecy_long_mean_passMinN_days %>%
   summarize(spearman_r = (corr.test(ndays_time, prm_mean_val, method="spearman"))$r,
             spearman_pval = (corr.test(ndays_time, prm_mean_val, method="spearman"))$p)
 
-
+# add an integer value for significance category (0=n.s., 1=0.05, 2=0.01)
+spearman.out <- spearman.out %>%
+  mutate(sig_category = ifelse(spearman_pval <= 0.01, 2, 
+                               ifelse(spearman_pval <= 0.05, 1, 0)))
 
