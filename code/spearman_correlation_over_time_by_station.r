@@ -5,6 +5,14 @@
 #  Required input:  the data frame ecy_meas_qa must be present in the workspace.
 #  This data frame is created in b_compile_annual_netCDF.r
 #  
+#  The threshold of min. number of records for a station and parameter to be
+#  retained in the data for analysis is flawed.  Specifically, the number of 
+#  records could be consecutive records in one year. This could identify
+#  seasonal trend as a station trend.
+#
+#  Rather than fix this problem (perhaps by adding a min. number of years),
+#  focus shifted to the trend analysis based on particular months.
+#
 #  August 2025
 #
 ###############################################################################
@@ -28,6 +36,10 @@ get_spearman <- function (data_frame) {
   return(spearman_stats)
 }
 
+
+###############################################################################
+# prepare data frame for Spearman analyses
+###############################################################################
 
 # get enhanced station table exported from GIS with subgroup attribute that can 
 # be used to filter stations in the HSIL study area 
@@ -81,6 +93,11 @@ ecy_long_mean_passMinN_days <- ecy_long_mean_passMinN %>%
    mutate(ndays_time = as.numeric(date - reference_date, units="days"))
 
 
+
+###############################################################################
+#  get Spearman stats across all months and years in the prepared data 
+###############################################################################
+
 # group by station and parameter and get Spearman stats
 spearman.out <- ecy_long_mean_passMinN_days %>%
   group_by(Station, parameter) %>%
@@ -91,4 +108,30 @@ spearman.out <- ecy_long_mean_passMinN_days %>%
 spearman.out <- spearman.out %>%
   mutate(sig_category = ifelse(spearman_pval <= 0.01, 2, 
                                ifelse(spearman_pval <= 0.05, 1, 0)))
+
+
+###############################################################################
+#  prepare alternate data for month-based correlations & get Spearman stats
+###############################################################################
+
+# add month and year variables
+ecy_long_mean_passMinN_days_months <- ecy_long_mean_passMinN_days %>%
+  mutate(month = month(date), year=year(date))
+
+
+## in block below add n filter prior to Spearman
+
+
+# get Spearman stats
+spearman.months.out <- ecy_long_mean_passMinN_days_months %>%
+  group_by(Station, parameter, month) %>%
+  summarize(spearman_r = (corr.test(ndays_time, prm_mean_val, method="spearman"))$r,
+            spearman_pval = (corr.test(ndays_time, prm_mean_val, method="spearman"))$p)
+
+# add an integer value for significance category (0=n.s., 1=0.05, 2=0.01)
+spearman.months.out <- spearman.months.out %>%
+  mutate(sig_category = ifelse(spearman_pval <= 0.01, 2, 
+                               ifelse(spearman_pval <= 0.05, 1, 0)))
+
+
 
