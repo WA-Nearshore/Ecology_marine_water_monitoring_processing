@@ -23,9 +23,10 @@ library(psych)
 # set depth that defines bottom of layer (top=surface) for parameter averaging
 mx_depth <- 10
 
-# set min number of records for Spearman to be run on Station-parameters.
-# Value of 5 results in 31 station-prm combos being removed out of 1011. 
+# Set min number of monthly records for Spearman to be run on Station-parameters.
+# Also set min number of years spanned by these monthly records. 
 min_n_Spearman <- 8
+min_yr_span <- 8
 
 
 
@@ -67,10 +68,10 @@ ecy_filt_long_mean_values <- ecy_filt_long %>%
   group_by(Station, parameter, date) %>%
   summarize(prm_mean_val = mean(value))
   
-# get data counts by Station-parameter pairs so low n cases can be removed
-# Use of corr.test below for Spearman gives error for n=1 cases.
+# Get data counts and year span by Station-parameter pairs so low n cases 
+# can be removed
 station_prm_record_count <- ecy_filt_long_mean_values %>%
-  group_by(Station,parameter) %>%
+  group_by(Station, parameter, month) %>%
   summarize(rec_count = n()) %>%
   arrange(rec_count)
 
@@ -119,7 +120,10 @@ ecy_long_mean_passMinN_days_months <- ecy_long_mean_passMinN_days %>%
   mutate(month = month(date), year=year(date))
 
 
-## in block below add n filter prior to Spearman
+# get number of monthly records and number of years spanned, for filtering
+ecy_sample_size_span <- ecy_long_mean_passMinN_days_months %>%
+  group_by(Station, parameter, month) %>%
+  summarize(n_months = n(), yr_span = max(year) - min(year))
 
 
 # get Spearman stats
