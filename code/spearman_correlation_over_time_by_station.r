@@ -30,14 +30,6 @@ min_yr_span <- 8
 
 
 
-########  functions #########
-get_spearman <- function (data_frame) {
-  spearman_out <- corr_test(data.frame$time, data.frame$value, method="spearman")
-  spearman_stats <- data.frame(r = spearman_out$r, p = spearman_out$p)
-  return(spearman_stats)
-}
-
-
 ###############################################################################
 # prepare data frame for Spearman analyses
 ###############################################################################
@@ -69,9 +61,9 @@ ecy_filt_long_mean_values <- ecy_filt_long %>%
   summarize(prm_mean_val = mean(value))
   
 # Get data counts and year span by Station-parameter pairs so low n cases 
-# can be removed
+# can be removed - this is a crude filter
 station_prm_record_count <- ecy_filt_long_mean_values %>%
-  group_by(Station, parameter, month) %>%
+  group_by(Station, parameter) %>%
   summarize(rec_count = n()) %>%
   arrange(rec_count)
 
@@ -94,25 +86,9 @@ ecy_long_mean_passMinN_days <- ecy_long_mean_passMinN %>%
    mutate(ndays_time = as.numeric(date - reference_date, units="days"))
 
 
-
 ###############################################################################
-#  get Spearman stats across all months and years in the prepared data 
-###############################################################################
-
-# group by station and parameter and get Spearman stats
-spearman.out <- ecy_long_mean_passMinN_days %>%
-  group_by(Station, parameter) %>%
-  summarize(spearman_r = (corr.test(ndays_time, prm_mean_val, method="spearman"))$r,
-            spearman_pval = (corr.test(ndays_time, prm_mean_val, method="spearman"))$p)
-
-# add an integer value for significance category (0=n.s., 1=0.05, 2=0.01)
-spearman.out <- spearman.out %>%
-  mutate(sig_category = ifelse(spearman_pval <= 0.01, 2, 
-                               ifelse(spearman_pval <= 0.05, 1, 0)))
-
-
-###############################################################################
-#  prepare alternate data for month-based correlations & get Spearman stats
+#  Prepare alternate data for month-based correlations & get Spearman stats
+#  Apply additional filtering of station-parameters with stratified data.
 ###############################################################################
 
 # add month and year variables
@@ -125,17 +101,42 @@ ecy_sample_size_span <- ecy_long_mean_passMinN_days_months %>%
   group_by(Station, parameter, month) %>%
   summarize(n_months = n(), yr_span = max(year) - min(year))
 
+# join dataset summary stats back onto data for filtering
+ecy_long_mean_jn <- ecy_long_mean_passMinN_days_months %>%
+  left_join(ecy_sample_size_span, by=join_by(Station,parameter,month))
+
+# filter data to meet sample size and year span requirements
+ecy_long_mean_month_filt <- ecy_long_mean_jn %>%
+  filter(n_months >= min_n_Spearman, yr_span >= min_yr_span)
+
 
 # get Spearman stats
-spearman.months.out <- ecy_long_mean_passMinN_days_months %>%
+spearman.months.out <- ecy_long_mean_month_filt %>%
   group_by(Station, parameter, month) %>%
-  summarize(spearman_r = (corr.test(ndays_time, prm_mean_val, method="spearman"))$r,
-            spearman_pval = (corr.test(ndays_time, prm_mean_val, method="spearman"))$p)
+  summarize(
+     spearman_r = (corr.test(ndays_time, prm_mean_val, method="spearman"))$r,
+     spearman_pval = (corr.test(ndays_time, prm_mean_val, method="spearman"))$p
+  )
 
+# Adjust p-values for multiple tests and
 # add an integer value for significance category (0=n.s., 1=0.05, 2=0.01)
-spearman.months.out <- spearman.months.out %>%
-  mutate(sig_category = ifelse(spearman_pval <= 0.01, 2, 
-                               ifelse(spearman_pval <= 0.05, 1, 0)))
+spearman.months.out2 <- spearman.months.out %>%
+  mutate(
+    spearman_pval_adj = p.adjust(spearman_pval, method="holm"),
+    sig_category = ifelse(isTRUE(all.equal(spearman_r, 0.0)), 0, 
+                   ifelse(spearman_pval_adj <= 0.01, 3*spearman_r/abs(spearman_r),
+                   ifelse(spearman_pval_adj <= 0.05, 2*spearman_r/abs(spearman_r),
+                          1*spearman_r/abs(spearman_r))))
+  )
+
+
+
+    sig_category = ifelse(all.equal(spearman_r, 0.0), 0,
+                   ifelse(spearman_pval_adj <= 0.01, 3*spearman_r/abs(spearman_r),
+                   ifelse(spearman_pval_adj <= 0.05, 2*spearman_r/abs(spearman_r),
+                          1*spearman_r/abs(spearman_r))))
+
+
 
 
 

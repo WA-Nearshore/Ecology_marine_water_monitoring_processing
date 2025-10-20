@@ -27,7 +27,12 @@ p <- ggplot(data=spearman.out.9vars,
             mapping = aes(x=month, y=Station, fill=sig_category)) +
      geom_tile() +
      facet_wrap(vars(parameter)) +
-     scale_fill_manual(values=c("white","gray80","gray30","white"))
+     theme_bw() +
+     scale_fill_manual(values=c("gray90","gray50","gray30"),
+                       na.value="white")
+
+
+
 
 
 
