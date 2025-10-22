@@ -123,10 +123,11 @@ spearman.months.out <- ecy_long_mean_month_filt %>%
 spearman.months.out2 <- spearman.months.out %>%
   mutate(
     spearman_pval_adj = p.adjust(spearman_pval, method="holm"),
-    sig_category = ifelse(isTRUE(all.equal(spearman_r, 0.0)), 0, 
-                   ifelse(spearman_pval_adj <= 0.01, 3*spearman_r/abs(spearman_r),
-                   ifelse(spearman_pval_adj <= 0.05, 2*spearman_r/abs(spearman_r),
-                          1*spearman_r/abs(spearman_r))))
+    sig_category = case_when(
+      abs(spearman_r - 0.00) < 0.000000001 ~ 0, 
+      spearman_pval_adj <= 0.01 ~ 3*spearman_r/abs(spearman_r),
+      spearman_pval_adj <= 0.05 ~ 2*spearman_r/abs(spearman_r),
+      TRUE ~ 1*spearman_r/abs(spearman_r))
   )
 
 
