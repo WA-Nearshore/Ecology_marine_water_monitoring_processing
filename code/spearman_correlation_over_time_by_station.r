@@ -132,12 +132,4 @@ spearman.months.out2 <- spearman.months.out %>%
 
 
 
-#    sig_category = ifelse(all.equal(spearman_r, 0.0), 0,
-#                   ifelse(spearman_pval_adj <= 0.01, 3*spearman_r/abs(spearman_r),
-#                   ifelse(spearman_pval_adj <= 0.05, 2*spearman_r/abs(spearman_r),
-#                          1*spearman_r/abs(spearman_r))))
-
-
-
-
 
