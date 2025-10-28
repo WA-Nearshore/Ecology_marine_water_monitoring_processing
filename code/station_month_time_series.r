@@ -26,7 +26,7 @@ sel_prm <- "Temp"
 ecy_long_mean_jn_filt <- ecy_long_mean_jn %>%
   filter(month == sel_month, parameter == sel_prm)
 
-# first graph all stations regardless of data record lentth and span
+##### first graph all stations regardless of data record lentth and span
 p1 <- ggplot(data = ecy_long_mean_jn_filt,
              mapping = aes(x=date, y=prm_mean_val, group=Station)) +
       geom_line(color="gray60") +
@@ -39,7 +39,7 @@ p1 <- ggplot(data = ecy_long_mean_jn_filt,
                    name = "Date") +
       scale_y_continuous(name = "Mean Temperature 0-10m (deg C)")
 
-# second, filter to just stations used for Spearman correlations
+##### second, filter to just stations used for Spearman correlations
 ecy_long_mean_jn_filt2 <- ecy_long_mean_jn_filt %>%
   filter(n_months >= min_n_Spearman, yr_span >= min_yr_span)
 p2 <- ggplot(data = ecy_long_mean_jn_filt2,
@@ -90,8 +90,8 @@ p3 <- ggplot(data = ecy_long_z,
 ###############################################################################
 
 # set parameters for the graphs
-sel_months <- c(8,9,10)
-month_labels <- c("August", "September", "October")
+sel_months <- c(2,3,4)
+month_labels <- c("February", "March", "April")
 sel_prm <- "Temp"
 
 # filter for months and parameter
@@ -123,6 +123,7 @@ p4 <- ggplot(data = ecy_long_z_fct,
       theme_bw() +
       theme(
        panel.grid.major.x = element_line(color="gray"),
+       axis.title.y = element_text(margin = margin(r=10)),
        strip.text = element_text(size=12)
       ) +
       scale_x_date(breaks=c(as.Date("2000-01-01"), as.Date("2005-01-01"),

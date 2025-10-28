@@ -1,18 +1,12 @@
 ###############################################################################
 #  Calculate Spearman correlation and significance for each variable in the
-#  Ecology dataset against time.
+#  Ecology dataset. Specifically, the mean parameter value within the specified
+#  surface depth layer (e.g. 10 m) for a given calendar month is correlated
+#  against time.
 #
 #  Required input:  the data frame ecy_meas_qa must be present in the workspace.
 #  This data frame is created in b_compile_annual_netCDF.r
 #  
-#  The threshold of min. number of records for a station and parameter to be
-#  retained in the data for analysis is flawed.  Specifically, the number of 
-#  records could be consecutive records in one year. This could identify
-#  seasonal trend as a station trend.
-#
-#  Rather than fix this problem (perhaps by adding a min. number of years),
-#  focus shifted to the trend analysis based on particular months.
-#
 #  August 2025
 #
 ###############################################################################
@@ -79,22 +73,14 @@ pass_stns <- unique(ecy_long_mean_passMinN$Station)
 all_stns <- unique(ecy_filt_long_mean_jn$Station)
 fail_stns <- setdiff(all_stns, pass_stns)
 
-
 # add time as day since 1989-01-01, Spearman requires numeric variable
 reference_date <- ymd("1989-01-01")
 ecy_long_mean_passMinN_days <- ecy_long_mean_passMinN %>%
    mutate(ndays_time = as.numeric(date - reference_date, units="days"))
 
-
-###############################################################################
-#  Prepare alternate data for month-based correlations & get Spearman stats
-#  Apply additional filtering of station-parameters with stratified data.
-###############################################################################
-
 # add month and year variables
 ecy_long_mean_passMinN_days_months <- ecy_long_mean_passMinN_days %>%
   mutate(month = month(date), year=year(date))
-
 
 # get number of monthly records and number of years spanned, for filtering
 ecy_sample_size_span <- ecy_long_mean_passMinN_days_months %>%
@@ -109,6 +95,11 @@ ecy_long_mean_jn <- ecy_long_mean_passMinN_days_months %>%
 ecy_long_mean_month_filt <- ecy_long_mean_jn %>%
   filter(n_months >= min_n_Spearman, yr_span >= min_yr_span)
 
+
+
+###############################################################################
+# Get Spearman correlation coefficients and significance 
+###############################################################################
 
 # get Spearman stats
 spearman.months.out <- ecy_long_mean_month_filt %>%
