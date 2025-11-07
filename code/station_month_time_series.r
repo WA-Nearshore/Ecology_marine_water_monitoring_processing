@@ -90,8 +90,8 @@ p3 <- ggplot(data = ecy_long_z,
 ###############################################################################
 
 # set parameters for the graphs
-sel_months <- c(2,3,4)
-month_labels <- c("February", "March", "April")
+sel_months <- c(10,11,12)
+month_labels <- c("October", "November", "December")
 sel_prm <- "Temp"
 
 # filter for months and parameter
