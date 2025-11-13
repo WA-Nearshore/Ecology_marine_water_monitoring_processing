@@ -13,15 +13,16 @@
 #     profiles  (table ecy_prof_tbl)
 #     stations  (table ecy_stn_tbl)
 #     variable metadata  (table var_metadata)
-#  Only the stations table is written to csv for use in GIS.
+#  Only the stations and variable metadtata tables are written to csv.
 #
 #  The measurements table (ecy_meas_qa) is available within the R session for 
 #  use by visualization scripts - it is not written to file due to its size.
 #  Visualization scripts should be run in sequence after this script is run.
 #  This script can be run by itself, but the intent is that it is sourced 
-#  from the code orchestrate.r which also handles visualization.
+#  from the code assemble_netCDF_data.r 
 # 
-#  July 2024
+#  July 2024. Initial dev.
+#  Nov. 2025. Revised.
 #
 ################################################################################
 
@@ -38,6 +39,12 @@ library(tidyverse)
 # In 1999 netCDF file, each of these vectors has length 34,419. 
 varList <- c("PO4","SiOH4","NH4","NO2","NO3","Xmiss_25cm","BatC","FluorAdjusted",
              "Turb","DOAdjusted","Salinity","Density","Cond","Temp")
+# variable labels to use for y axis label - matches order of varList (defined
+# in b_compile_annual_netCDF.r)
+varLabel <- c("PO4", "SiOH4", "NH4", "NO2", "NO3", "Transmission 25cm",
+              "Beam Attenuation", "Fluorescence", "Turbidity", 
+              "Dissolved Oxygen", "Salinity", "Density", "Conductivity",
+              "Temperature")
 # set vector of QA variables to extract in same order as measured vars.
 # In 1999 netCDF file, each of these vectors has length 34,419.
 qaList <- c("PO4_QC","SiOH4_QC","NH4_QC","NO2_QC","NO3_QC","Xmiss_25cmQC",
@@ -75,7 +82,7 @@ file_index <- 1
 for (ifile in inList) {
   
   print(sprintf("Processing %s",ifile))
-  filepath <- str_c(local_netCDF_home, ifile, sep=sepsym)
+  filepath <- str_c(local_netCDF_home, ifile, sep="/")
   nc <- nc_open(filepath) 
 
   #################################################################### 
