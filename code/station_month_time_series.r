@@ -3,6 +3,8 @@
 # a) all Spearman stations
 # b) all stations
 #
+# A separate graph is made with 3 consecutive months as facets.
+#
 # The input data 'ecy_long_mean_jn' must be already in the workspace.
 # It is created in the code in file spearman_correlation_over_time_by_station.r
 #
@@ -135,6 +137,10 @@ p4 <- ggplot(data = ecy_long_z_fct,
       facet_wrap(vars(month), nrow=3)
 
 
+###############################################################################
+# Departure graph for selected variable and month-of-year
+# All stations depicted as points in temp - zscore space.
+###############################################################################
 
 
 

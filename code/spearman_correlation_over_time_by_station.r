@@ -30,7 +30,7 @@ min_yr_span <- 8
 
 # get enhanced station table exported from GIS with subgroup attribute that can 
 # be used to filter stations in the HSIL study area 
-stn_tbl_path <- str_c("output_tables", "ecy_stations_subgroups_tbl.csv", sep=sepsym)
+stn_tbl_path <- str_c("output_tables", "ecy_stations_subgroups_tbl.csv", sep="/")
 stations <- read.csv(stn_tbl_path, stringsAsFactors=FALSE)
 ecy_meas_qa_filt <- ecy_meas_qa %>% left_join(stations, by="Station") %>%
                                     filter(subgroup == "HSIL_study_area")
