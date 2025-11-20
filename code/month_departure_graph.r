@@ -10,6 +10,9 @@
 #
 ###############################################################################
 
+library(tidyverse)
+library(ggExtra)
+
 # if prerequisite 'ecy_long_mean_jn' must be created, run these two lines once
 # i.e. comment lines out if this script is run repeatedly
 # source("code/assemble_netCDF_data.r")
@@ -74,6 +77,11 @@ ecy_long_z_fct <- ecy_long_z %>%
 
 # filter for 2024 data
 ecy_long_z_fct_Y <- ecy_long_z_fct %>% filter(year == sel_year)
+
+# Open a png output device; Used to properly export to file the multi-graph
+# diagram (main graph and a marginal graph)
+png(filename = fname, width=6, height=4, units="in", res=250)
+
 
 # make departure graph
 p4 <- ggplot(data = ecy_long_z_fct_Y,
