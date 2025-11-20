@@ -2,10 +2,14 @@
 #
 #  Make departure graph from Ecology marine monitoring data.
 #  Departures from long-term means are shown for all "Spearman" stations for
-#  one month-of-year.  Each site is depicted as a point in temp-zscore space.
+#  one month-of-year.  
 #
-#  The data frame ecy_long_mean_jn must be available in the workspace. It is
-#  created by code in spearman_correlation_over_time_by_station.r
+#  The input data must be available in the workspace, or it can be created
+#  from the source netCDF files by uncommenting the first two code lines below.
+#    
+#  Also the station table with distance from ocean must exist as a csv file
+#  at "output_tables/ecy_stations_distance_export.csv"
+# 
 #  November 2025.
 #
 ###############################################################################
@@ -13,10 +17,18 @@
 library(tidyverse)
 library(ggExtra)
 
+# filename for output graph
+fname <- "output_graphs/stn_departures_month.png"
+
+
 # if prerequisite 'ecy_long_mean_jn' must be created, run these two lines once
 # i.e. comment lines out if this script is run repeatedly
-# source("code/assemble_netCDF_data.r")
-# source("code/spearman_correlation_over_time_by_station.r")
+print("Assembling netCDF data...") 
+source("code/assemble_netCDF_data.r")
+print("Spearman correlations...")
+source("code/spearman_correlation_over_time_by_station.r")
+
+print("Starting...")
 
 # set parameters for the graphs
 sel_month <- 2
@@ -33,6 +45,7 @@ min_yr_span <- 8
 ######################################################################
 # Filters for month, parameter and Spearman requirements 
 ######################################################################
+print("First filtering...")
 
 # filter for months and parameter
 ecy_long_mean_jn_filt <- ecy_long_mean_jn %>%
@@ -46,6 +59,7 @@ ecy_long_mean_jn_filt2 <- ecy_long_mean_jn_filt %>%
 ######################################################################
 # get station-month stats
 ######################################################################
+print("Get station-month stats...")
 
 # get station-month mean and sd
 ecy_stn_stats <- ecy_long_mean_jn_filt2 %>%
@@ -61,6 +75,7 @@ ecy_long_z <- ecy_long_mean_jn_filt2 %>%
 ######################################################################
 # convert stations to factor in order of dist to ocean 
 ######################################################################
+print("Convert stations to factor sort by dist...")
 
 # Open table with distance-from-ocean and HSIL flag
 filepath2 <- str_c("output_tables","ecy_stations_distance_export.csv", sep="/")
@@ -78,11 +93,12 @@ ecy_long_z_fct <- ecy_long_z %>%
 # filter for 2024 data
 ecy_long_z_fct_Y <- ecy_long_z_fct %>% filter(year == sel_year)
 
+print("Open png device...")
 # Open a png output device; Used to properly export to file the multi-graph
 # diagram (main graph and a marginal graph)
 png(filename = fname, width=6, height=4, units="in", res=250)
 
-
+print("Graph...")
 # make departure graph
 p4 <- ggplot(data = ecy_long_z_fct_Y,
              mapping = aes(x=Station, y=departure)) +
@@ -99,4 +115,9 @@ p4 <- ggplot(data = ecy_long_z_fct_Y,
       scale_y_continuous(name = "Departure (deg C)", limits=c(-1.2, 1.2))
       
 
+# add marginal histograms
+p2 <- ggMarginal(p4, type="histogram", fill="gray90", color="gray70", 
+                 linewidth=0.25, size=20, margins="y")
+print(p2)
+dev.off()
 
